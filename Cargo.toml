@@ -1,5 +1,5 @@
 [package]
-name = "bevy_playground"
+name = "bevy-asteroid-game-showcase"
 version = "0.1.0"
 authors = ["nic96 <jeromyreimer@gmail.com>"]
 edition = "2018"
