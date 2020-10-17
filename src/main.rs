@@ -1,7 +1,7 @@
 use asteroids::AsteroidsPlugin;
 use bevy::prelude::*;
-use gamedata::{GameData, GameDataPlugin};
-use gamestate::{GameState, GameStatePlugin};
+use gamedata::{GameDataPlugin};
+use gamestate::{GameStatePlugin};
 use rocket::RocketPlugin;
 mod asteroids;
 mod gamedata;

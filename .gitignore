@@ -1,1 +1,5 @@
 /target
+public/assets
+public/target
+.cargo
+.history
