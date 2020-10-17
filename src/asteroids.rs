@@ -34,12 +34,12 @@ pub struct AsteroidsPlugin;
 impl Plugin for AsteroidsPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(AsteroidSpawner {
-            z_spawn_position: -100.0,
+            z_spawn_position: -300.0,
             last_z_position: 0.0,
             z_interval: 24.0,
             z_rand: 15.0,
             min_x_spacing: 2.0,
-            z_velocity: 20.0,
+            z_velocity: 60.0,
             x_velocity: 0.0,
             max_x: 12.0,
             distance_traveled: 0.0,
@@ -102,7 +102,7 @@ fn spawn_asteroids(
     let mut seed = (asteroid_spawner.distance_traveled * 100.0).round() as u64;
     fastrand::seed(seed);
 
-    let asteroid_count = fastrand::i32(0..12);
+    let asteroid_count = fastrand::i32(0..3);
 
     commands
         .spawn(PbrComponents {
@@ -128,13 +128,13 @@ fn spawn_asteroids(
                 let asteroid = fastrand::usize(0..2);
                 let z = fastrand::f32() * asteroid_spawner.z_rand;
                 let mut x =
-                    (fastrand::f32() * asteroid_spawner.max_x * 8.0) - asteroid_spawner.max_x * 4.0;
+                    fastrand::f32() * asteroid_spawner.max_x * 2.0 - asteroid_spawner.max_x;
                 for x1 in &x_positions {
                     while (x1 - x).abs() < asteroid_spawner.min_x_spacing {
                         seed += 1;
                         fastrand::seed(seed);
-                        x = (fastrand::f32() * asteroid_spawner.max_x * 8.0)
-                            - asteroid_spawner.max_x * 4.0;
+                        x = fastrand::f32() * asteroid_spawner.max_x * 2.0
+                            - asteroid_spawner.max_x;
                     }
                 }
                 x_positions.push(x);
@@ -144,6 +144,37 @@ fn spawn_asteroids(
                     material: asteroid_spawner.material_handles[asteroid],
                     transform: Transform::from_translation_rotation_scale(
                         Vec3::new(x, 1.0, z),
+                        Quat::from_axis_angle(
+                            Vec3::new(fastrand::f32(), fastrand::f32(), 0.0).normalize(),
+                            fastrand::f32() * 3.14,
+                        ),
+                        fastrand::f32() * 0.25 + 0.75,
+                    ),
+                    ..Default::default()
+                });
+            }
+
+            // border asteroids
+            let border_spacing = 4.0;
+            let border_asteroids_count = (asteroid_spawner.z_interval / border_spacing) as usize;
+            for z in 0..border_asteroids_count {
+                parent.spawn(PbrComponents {
+                    mesh: asteroid_spawner.mesh_handles[border_asteroids_count % 3],
+                    material: asteroid_spawner.material_handles[border_asteroids_count % 3],
+                    transform: Transform::from_translation_rotation_scale(
+                        Vec3::new(-asteroid_spawner.max_x, 1.0, z as f32 * border_spacing),
+                        Quat::from_axis_angle(
+                            Vec3::new(fastrand::f32(), fastrand::f32(), 0.0).normalize(),
+                            fastrand::f32() * 3.14,
+                        ),
+                        fastrand::f32() * 0.25 + 0.75,
+                    ),
+                    ..Default::default()
+                }).spawn(PbrComponents {
+                    mesh: asteroid_spawner.mesh_handles[border_asteroids_count % 3],
+                    material: asteroid_spawner.material_handles[border_asteroids_count % 3],
+                    transform: Transform::from_translation_rotation_scale(
+                        Vec3::new(asteroid_spawner.max_x, 1.0, z as f32 * border_spacing),
                         Quat::from_axis_angle(
                             Vec3::new(fastrand::f32(), fastrand::f32(), 0.0).normalize(),
                             fastrand::f32() * 3.14,
@@ -245,7 +276,7 @@ fn despawn_asteroids(
             // the current entity has an asteroid group component
             if let Ok(transform) = asteroid_group_query.get::<Transform>(entity) {
                 // the current entity has a transform component
-                if transform.translation().z() > 10.0 {
+                if transform.translation().z() > 0.0 {
                     commands.despawn_recursive(entity);
                 }
             }
