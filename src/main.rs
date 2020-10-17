@@ -1,6 +1,6 @@
 use asteroids::AsteroidsPlugin;
 use bevy::prelude::*;
-use gamedata::GameData;
+use gamedata::{GameData, GameDataPlugin};
 use gamestate::{GameState, GameStatePlugin};
 use rocket::RocketPlugin;
 mod asteroids;
@@ -10,22 +10,27 @@ mod rocket;
 
 // the app entry point. hopefully you recognize it from the examples above!
 fn main() {
+    #[cfg(not(target_arch = "wasm32"))]
+    env_logger::init();
+
+    #[cfg(target_arch = "wasm32")]
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+    #[cfg(target_arch = "wasm32")]
+    console_log::init_with_level(log::Level::Info).expect("cannot initialize console_log");
+
     App::build()
         .add_resource(WindowDescriptor {
             title: "Ha! a Title".into(),
             ..Default::default()
         })
         .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.005)))
-        .add_resource(Msaa { samples: 8 })
+        // .add_resource(Msaa { samples: 8 })
         .add_default_plugins()
         .add_plugin(GameStatePlugin)
         .add_plugin(RocketPlugin)
         .add_plugin(AsteroidsPlugin)
+        .add_plugin(GameDataPlugin)
         .add_startup_system(setup.system())
-        .add_resource(GameData {
-            game_state: GameState::Menu,
-            score: 0,
-        })
         .run();
 }
 

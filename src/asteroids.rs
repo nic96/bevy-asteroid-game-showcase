@@ -56,18 +56,17 @@ impl Plugin for AsteroidsPlugin {
 }
 
 fn load_assets(
-    asset_server: Res<AssetServer>,
+    // asset_server: Res<AssetServer>,
     mut asteroid_spawner: ResMut<AsteroidSpawner>,
-    mut textures: ResMut<Assets<Texture>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    for path in ASTEROID_TEXTURES {
-        let asteroid_texture_handle = asset_server.load_sync(&mut textures, path).unwrap();
+    for _path in ASTEROID_TEXTURES {
+        // let asteroid_texture_handle = asset_server.load(path).unwrap();
 
         let asteroid_material_handle = materials.add(StandardMaterial {
-            albedo: Color::rgb(1.0, 1.0, 1.0),
-            albedo_texture: Some(asteroid_texture_handle),
+            albedo: Color::rgb_u8(200, 200, 200),
+            // albedo_texture: Some(asteroid_texture_handle),
             ..Default::default()
         });
         asteroid_spawner
@@ -75,8 +74,9 @@ fn load_assets(
             .push(asteroid_material_handle);
     }
 
-    for path in ASTEROID_MESHES {
-        let mesh_handle = asset_server.load_sync(&mut meshes, path).unwrap();
+    for _path in ASTEROID_MESHES {
+        // let mesh_handle = asset_server.load_sync(&mut meshes, path).unwrap();
+        let mesh_handle = meshes.add(Mesh::from(shape::Cube { size: 1.0 }));
         asteroid_spawner.mesh_handles.push(mesh_handle);
     }
 }
@@ -155,7 +155,7 @@ fn spawn_asteroids(
             }
 
             // border asteroids
-            let border_spacing = 4.0;
+            let border_spacing = 16.0;
             let border_asteroids_count = (asteroid_spawner.z_interval / border_spacing) as usize;
             for z in 0..border_asteroids_count {
                 parent.spawn(PbrComponents {
@@ -194,7 +194,6 @@ fn asteroid_spawner_movement(
     time: Res<Time>,
     game_data: Res<GameData>,
     mut asteroid_spawner: ResMut<AsteroidSpawner>,
-    keyboard_input: Res<Input<KeyCode>>,
     rocket_specs: Res<RocketSpecs>,
 ) {
     match game_data.game_state {
@@ -207,11 +206,11 @@ fn asteroid_spawner_movement(
     let angle = time.delta_seconds * rocket_specs.steering_speed;
     let percent_turned = angle / rocket_specs.max_steering_angle;
     let mut x_velocity_change = percent_turned * rocket_specs.max_x_velocity;
-    if keyboard_input.pressed(KeyCode::A) {
+    if game_data.move_left {
         if asteroid_spawner.x_translation > asteroid_spawner.max_x {
             x_velocity_change = 0.0;
         }
-    } else if keyboard_input.pressed(KeyCode::D) {
+    } else if game_data.move_right {
         if asteroid_spawner.x_translation < -asteroid_spawner.max_x {
             x_velocity_change = 0.0;
         } else {

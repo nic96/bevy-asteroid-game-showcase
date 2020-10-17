@@ -27,7 +27,6 @@ impl Plugin for RocketPlugin {
 fn steer_rocket(
     time: Res<Time>,
     game_data: Res<GameData>,
-    keyboard_input: Res<Input<KeyCode>>,
     rocket_specs: Res<RocketSpecs>,
     _rocket: &Rocket,
     mut transform: Mut<Transform>,
@@ -41,11 +40,11 @@ fn steer_rocket(
     let axis_angle = transform.rotation().to_axis_angle();
     let y_rotation = axis_angle.0.y() * axis_angle.1;
     let mut angle = time.delta_seconds * rocket_specs.steering_speed;
-    if keyboard_input.pressed(KeyCode::A) {
+    if game_data.move_left {
         if y_rotation >= rocket_specs.max_steering_angle {
             return;
         };
-    } else if keyboard_input.pressed(KeyCode::D) {
+    } else if game_data.move_right {
         if y_rotation <= -rocket_specs.max_steering_angle {
             return;
         };
@@ -67,26 +66,29 @@ fn steer_rocket(
 
 fn spawn_rocket(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    // asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut textures: ResMut<Assets<Texture>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    // mut textures: ResMut<Assets<Texture>>,
 ) {
-    let texture_handle = asset_server
-        .load_sync(&mut textures, "assets/models/rocket/RocketColor.png")
-        .unwrap();
+    // let texture_handle = asset_server
+    //     .load("assets/models/rocket/RocketColor.png")
+    //     .unwrap();
 
     let material_handle = materials.add(StandardMaterial {
-        albedo_texture: Some(texture_handle),
+        // albedo_texture: Some(texture_handle),
+        albedo: Color::rgb(1.0, 1.0, 1.0),
         ..Default::default()
     });
 
     commands
         .spawn(PbrComponents {
-            mesh: asset_server
-                .load("assets/models/rocket/Rocket.glb")
-                .unwrap(),
+            // mesh: asset_server
+            //     .load("assets/models/rocket/Rocket.glb")
+            //     .unwrap(),
+            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
             material: material_handle,
-            transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
+            transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)).with_apply_non_uniform_scale(Vec3::new(1.0, 1.0, 4.0)),
             ..Default::default()
         })
         .with(Rocket);
