@@ -3,14 +3,14 @@ use bevy::prelude::*;
 use crate::{gamedata::GameData, rocket::RocketSpecs};
 
 const ASTEROID_TEXTURES: &[&str] = &[
-    "assets/models/asteroids/asteroid1/Asteroid1Color.png",
-    "assets/models/asteroids/asteroid2/Asteroid2Color.png",
-    "assets/models/asteroids/asteroid3/Asteroid3Color.png",
+    "models/asteroids/asteroid1/Asteroid1Color.png",
+    "models/asteroids/asteroid2/Asteroid2Color.png",
+    "models/asteroids/asteroid3/Asteroid3Color.png",
 ];
 const ASTEROID_MESHES: &[&str] = &[
-    "assets/models/asteroids/asteroid1/Asteroid1.glb",
-    "assets/models/asteroids/asteroid2/Asteroid2.glb",
-    "assets/models/asteroids/asteroid3/Asteroid3.glb",
+    "models/asteroids/asteroid1/Asteroid1.glb#Mesh0/Primitive0",
+    "models/asteroids/asteroid2/Asteroid2.glb#Mesh0/Primitive0",
+    "models/asteroids/asteroid3/Asteroid3.glb#Mesh0/Primitive0",
 ];
 
 struct AsteroidSpawner {
@@ -58,12 +58,10 @@ impl Plugin for AsteroidsPlugin {
 fn load_assets(
     asset_server: Res<AssetServer>,
     mut asteroid_spawner: ResMut<AsteroidSpawner>,
-    mut textures: ResMut<Assets<Texture>>,
-    mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     for path in ASTEROID_TEXTURES {
-        let asteroid_texture_handle = asset_server.load_sync(&mut textures, path).unwrap();
+        let asteroid_texture_handle = asset_server.load(*path);
 
         let asteroid_material_handle = materials.add(StandardMaterial {
             albedo: Color::rgb(1.0, 1.0, 1.0),
@@ -76,7 +74,7 @@ fn load_assets(
     }
 
     for path in ASTEROID_MESHES {
-        let mesh_handle = asset_server.load_sync(&mut meshes, path).unwrap();
+        let mesh_handle = asset_server.load(*path);
         asteroid_spawner.mesh_handles.push(mesh_handle);
     }
 }
@@ -140,8 +138,8 @@ fn spawn_asteroids(
                 x_positions.push(x);
 
                 parent.spawn(PbrComponents {
-                    mesh: asteroid_spawner.mesh_handles[asteroid],
-                    material: asteroid_spawner.material_handles[asteroid],
+                    mesh: asteroid_spawner.mesh_handles[asteroid].clone(),
+                    material: asteroid_spawner.material_handles[asteroid].clone(),
                     transform: Transform::from_translation_rotation_scale(
                         Vec3::new(x, 1.0, z),
                         Quat::from_axis_angle(
@@ -159,8 +157,8 @@ fn spawn_asteroids(
             let border_asteroids_count = (asteroid_spawner.z_interval / border_spacing) as usize;
             for z in 0..border_asteroids_count {
                 parent.spawn(PbrComponents {
-                    mesh: asteroid_spawner.mesh_handles[border_asteroids_count % 3],
-                    material: asteroid_spawner.material_handles[border_asteroids_count % 3],
+                    mesh: asteroid_spawner.mesh_handles[border_asteroids_count % 3].clone(),
+                    material: asteroid_spawner.material_handles[border_asteroids_count % 3].clone(),
                     transform: Transform::from_translation_rotation_scale(
                         Vec3::new(-asteroid_spawner.max_x, 1.0, z as f32 * border_spacing),
                         Quat::from_axis_angle(
@@ -171,8 +169,8 @@ fn spawn_asteroids(
                     ),
                     ..Default::default()
                 }).spawn(PbrComponents {
-                    mesh: asteroid_spawner.mesh_handles[border_asteroids_count % 3],
-                    material: asteroid_spawner.material_handles[border_asteroids_count % 3],
+                    mesh: asteroid_spawner.mesh_handles[border_asteroids_count % 3].clone(),
+                    material: asteroid_spawner.material_handles[border_asteroids_count % 3].clone(),
                     transform: Transform::from_translation_rotation_scale(
                         Vec3::new(asteroid_spawner.max_x, 1.0, z as f32 * border_spacing),
                         Quat::from_axis_angle(

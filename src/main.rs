@@ -23,7 +23,7 @@ fn main() {
         .add_plugin(AsteroidsPlugin)
         .add_startup_system(setup.system())
         .add_resource(GameData {
-            game_state: GameState::Menu,
+            game_state: GameState::Playing,
             score: 0,
         })
         .run();

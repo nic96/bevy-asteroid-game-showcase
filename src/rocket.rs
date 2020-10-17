@@ -69,11 +69,9 @@ fn spawn_rocket(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut textures: ResMut<Assets<Texture>>,
 ) {
     let texture_handle = asset_server
-        .load_sync(&mut textures, "assets/models/rocket/RocketColor.png")
-        .unwrap();
+        .load("models/rocket/RocketColor.png");
 
     let material_handle = materials.add(StandardMaterial {
         albedo_texture: Some(texture_handle),
@@ -83,8 +81,7 @@ fn spawn_rocket(
     commands
         .spawn(PbrComponents {
             mesh: asset_server
-                .load("assets/models/rocket/Rocket.glb")
-                .unwrap(),
+                .load("models/rocket/Rocket.gltf#Mesh0/Primitive0"),
             material: material_handle,
             transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
             ..Default::default()
