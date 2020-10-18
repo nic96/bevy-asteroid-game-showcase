@@ -191,6 +191,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy-asteroid-game-showcase"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "fastrand",
+]
+
+[[package]]
 name = "bevy-glsl-to-spirv"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -404,14 +412,6 @@ dependencies = [
  "bevy_transform",
  "bevy_type_registry",
  "bevy_window",
-]
-
-[[package]]
-name = "bevy_playground"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "fastrand",
 ]
 
 [[package]]

@@ -1,12 +1,14 @@
 use asteroids::AsteroidsPlugin;
-use bevy::prelude::*;
+use bevy::{prelude::*};
 use gamedata::GameData;
 use gamestate::{GameState, GameStatePlugin};
 use rocket::RocketPlugin;
+use screens::ScreensPlugin;
 mod asteroids;
 mod gamedata;
 mod gamestate;
 mod rocket;
+mod screens;
 
 // the app entry point. hopefully you recognize it from the examples above!
 fn main() {
@@ -21,6 +23,7 @@ fn main() {
         .add_plugin(GameStatePlugin)
         .add_plugin(RocketPlugin)
         .add_plugin(AsteroidsPlugin)
+        .add_plugin(ScreensPlugin)
         .add_startup_system(setup.system())
         .add_resource(GameData {
             game_state: GameState::Menu,
